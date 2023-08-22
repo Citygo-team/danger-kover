@@ -34,9 +34,21 @@ module Danger
     # @return [Integer]
     attr_accessor :total_threshold
 
+    # A getter for `total_threshold`, returning 70% by default.
+    # @return [Integer]
+    def total_threshold
+      @total_threshold ||= 70
+    end
+
     # Modified file code coverage % threshold [0-100].
     # @return [Integer]
     attr_accessor :file_threshold
+
+    # A getter for `file_threshold`, returning 70% by default.
+    # @return [Integer]
+    def file_threshold
+      @file_threshold ||= 70
+    end
 
     # Fail if under threshould, just warn otherwise.
     # @return [Boolean]

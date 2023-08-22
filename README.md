@@ -12,7 +12,7 @@ Add this line to your application's Gemfile:
 gem 'danger-kover'
 ```
 
-## Usage Kover
+## Danger Kover Plugin Usage 
 
 It depends on having a Kover coverage report generated for your project. 
 
@@ -21,8 +21,8 @@ For Android projects, [kotlinx-kover](https://github.com/Kotlin/kotlinx-kover) w
 Running with default values:
 
 ```ruby
-# Report coverage of modified files, fail if either total 
-# project coverage or any modified file's coverage is under 90%
+# Report coverage of modified files. 
+# Fail if either total project coverage or any modified file's coverage is under 70%.
 kover.report 'Module Name', 'path/to/kover/report.xml'
 ```
 
