@@ -60,6 +60,26 @@ module Danger
       @fail_if_under_threshold ||= true
     end
 
+    # Show plugin repository link.
+    # @return [Boolean]
+    attr_accessor :link_repository
+
+    # A getter for `link_repository`, returning `true` by default.
+    # @return [Boolean]
+    def link_repository
+      @link_repository ||= true
+    end
+
+    # Show not found files in report count.
+    # @return [Boolean]
+    attr_accessor :count_not_found
+
+    # A getter for `count_not_found`, returning `true` by default.
+    # @return [Boolean]
+    def count_not_found
+      @count_not_found ||= true
+    end
+
     # Report coverage on diffed files, as well as overall coverage.
     #
     # @param   [String] moduleName
@@ -112,48 +132,54 @@ module Danger
       puts "Here is the touched files coverage hash"
       puts touchedFilesHash
 
-      output = "## 🎯 #{moduleName} Code Coverage: **`#{'%.2f' % coveragePercent}%`**\n"
+      output = "### 🎯 #{moduleName} Code Coverage: **`#{'%.2f' % coveragePercent}%`**\n"
 
       if touchedFilesHash.empty?
-        output << "The new and modified files are not part of the Kover coverage report 👀.\n"
+        output << "The new and updated files are not part of this module coverage report 👀.\n"
       else
-        output << "### Coverage of Modified Files:\n"
+        output << "**Modified files:**\n"
         output << "File | Coverage\n"
         output << ":-----|:-----:\n"
       end
 
-      # go through each file:
+      # Go through each file:
       touchedFilesHash.sort.each do |fileName, coveragePercent|
         output << "`#{fileName}` | **`#{'%.2f' % coveragePercent}%`**\n"
 
-        # warn or fail if under specified file threshold:
-        if (coveragePercent < file_threshold)
-          warningMessage = "Uh oh! #{fileName} is under #{file_threshold}% coverage!"
-          if (fail_if_under_threshold)
-            fail warningMessage
-          else 
-            warn warningMessage
-          end
+        # Check file coverage
+        if (coveragePercent == 0)
+          advise("Oops! #{fileName} does not have any test coverage.")
+        elsif (coveragePercent < file_threshold)
+          advise("Oops! #{fileName} is under #{file_threshold}% coverage.")
         end
       end
 
-      output << "\n"
-      output << "Number of files not found in coverage report: #{fileNamesNotInReport.size}."
-      output << "\n\n"
+      if (count_not_found)
+        output << "\n\n"
+        output << "Number of files not found in coverage report: #{fileNamesNotInReport.size}."
+      end
 
-      output << 'Code coverage by [danger-kover](https://github.com/JCarlosR/danger-kover).'
+      if (link_repository)
+        output << "\n\n"
+        output << 'Code coverage by [danger-kover](https://github.com/JCarlosR/danger-kover).'
+      end
+      
       markdown output
 
-      # warn or fail if total coverage is under specified threshold
-      if (coveragePercent < total_threshold)
-        totalCoverageWarning = "Oops! The module #{moduleName} codebase is under #{total_threshold}% coverage."
-        
-        if (fail_if_under_threshold) 
-          fail totalCoverageWarning
-        else 
-          warn totalCoverageWarning
-        end
+      # Check total coverage
+      if (coveragePercent < total_threshold)        
+        advise("Oops! The module #{moduleName} codebase is under #{total_threshold}% coverage.")
       end
     end
+
+    # Warn or fail, depending on the `fail_if_under_threshold` flag.
+    private def advise(message)
+      if (fail_if_under_threshold)
+        fail message
+      else
+        warn message
+      end
+    end
+
   end
 end
