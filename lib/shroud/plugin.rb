@@ -2,100 +2,33 @@ require 'nokogiri'
 
 module Danger
 
-  # Parse a Kover or Jacoco report to enforce code coverage on CI. Results are passed out as a table in markdown.
+  # Parse a Kover report to enforce code coverage on CI. 
+  # Results are passed out as a table in markdown.
   #
-  # Shroud depends on having a Kover or Jacoco coverage report generated for your project.
+  # It depends on having a Kover coverage report generated for your project.
   #
   #
-  # @example Running Shroud with default values for Kover
+  # @example Running with default values for Kover
   #
   #          # Report coverage of modified files, fail if either total project coverage
   #          # or any modified file's coverage is under 90%
   #          shroud.reportKover 'Project Name', 'path/to/kover/report.xml'
   #
-  # @example Running Shroud with custom coverage thresholds for Kover
+  # @example Running with custom coverage thresholds for Kover
   #
   #          # Report coverage of modified files, fail if total project coverage is under 80%,
   #          # or if any modified file's coverage is under 95%
   #          shroud.reportKover 'Project Name', 'path/to/kover/report.xml', 80, 95
   #
-  # @example Warn on builds instead of fail for Kover
+  # @example Warn on builds instead of failing for Kover
   #
   #          # Report coverage of modified files the same as the above example, except the
   #          # builds will only warn instead of fail if below thresholds
   #          shroud.reportKover 'Project Name', 'path/to/kover/report.xml', 80, 95, false
-  #
-  # @example Running Shroud with default values for Jacoco
-  #
-  #          # Report coverage of modified files, fail if either total project coverage
-  #          # or any modified file's coverage is under 90%
-  #          shroud.reportJacoco 'Project Name', 'path/to/jacoco/report.xml'
-  #
-  # @example Running Shroud with custom coverage thresholds for Jacoco
-  #
-  #          # Report coverage of modified files, fail if total project coverage is under 80%,
-  #          # or if any modified file's coverage is under 95%
-  #          shroud.reportJacoco 'Project Name', 'path/to/jacoco/report.xml', 80, 95
-  #
-  # @example Warn on builds instead of fail for Jacoco
-  #
-  #          # Report coverage of modified files the same as the above example, except the
-  #          # builds will only warn instead of fail if below thresholds
-  #          shroud.reportJacoco 'Project Name', 'path/to/jacoco/report.xml', 80, 95, false
-  #          
+  #    
   # @tags android, kover, jacoco, coverage
   #
   class DangerShroud < Plugin
-
-    # <b>DEPRECATED:</b> Please use <tt>reportJacoco</tt> or <tt>reportKover</tt> instead.
-    #
-    # Report coverage on diffed files, as well as overall coverage.
-    #
-    # @param   [String] file
-    #          file path to a Jacoco xml coverage report.
-    #
-    # @param   [Integer] totalProjectThreshold
-    #          defines the required percentage of total project coverage for a passing build.
-    #          default 90.
-    #
-    # @param   [Integer] modifiedFileThreshold
-    #          defines the required percentage of files modified in a PR for a passing build.
-    #          default 90.
-    #
-    # @param   [Boolean] failIfUnderThreshold
-    #          if true, will fail builds that are under the provided thresholds. if false, will only warn.
-    #          default true.
-    #
-    # @return  [void]
-    def report(file, totalProjectThreshold = 90, modifiedFileThreshold = 90, failIfUnderThreshold = true)
-      warn "[DEPRECATION] `report` is deprecated.  Please use `reportJacoco` or `reportKover` instead."
-      reportJacoco('Project', file, totalProjectThreshold = 90, modifiedFileThreshold = 90, failIfUnderThreshold = true)
-    end
-
-    # Report coverage on diffed files, as well as overall coverage.
-    #
-    # @param   [String] moduleName
-    #          the display name of the project or module
-    #
-    # @param   [String] file
-    #          file path to a Jacoco xml coverage report.
-    #
-    # @param   [Integer] totalProjectThreshold
-    #          defines the required percentage of total project coverage for a passing build.
-    #          default 90.
-    #
-    # @param   [Integer] modifiedFileThreshold
-    #          defines the required percentage of files modified in a PR for a passing build.
-    #          default 90.
-    #
-    # @param   [Boolean] failIfUnderThreshold
-    #          if true, will fail builds that are under the provided thresholds. if false, will only warn.
-    #          default true.
-    #
-    # @return  [void]
-    def reportJacoco(moduleName, file, totalProjectThreshold = 90, modifiedFileThreshold = 90, failIfUnderThreshold = true)
-      internalReport('Jacoco', moduleName, file, totalProjectThreshold, modifiedFileThreshold, failIfUnderThreshold)
-    end
 
     # Report coverage on diffed files, as well as overall coverage.
     #
@@ -125,6 +58,7 @@ module Danger
     private def internalReport(reportType, moduleName, file, totalProjectThreshold, modifiedFileThreshold, failIfUnderThreshold)
       raise "Please specify file name." if file.empty?
       raise "No #{reportType} xml report found at #{file}" unless File.exist? file
+      
       rawXml = File.read(file)
       parsedXml = Nokogiri::XML.parse(rawXml)
       totalInstructionCoverage = parsedXml.xpath("/report/counter[@type='INSTRUCTION']")
@@ -164,11 +98,15 @@ module Danger
       puts "Here is the touched files coverage hash"
       puts touchedFilesHash
 
-      output = "## 🧛 #{moduleName} Code Coverage: **`#{'%.2f' % coveragePercent}%`**\n"
+      output = "## 🎯 #{moduleName} Code Coverage: **`#{'%.2f' % coveragePercent}%`**\n"
 
-      output << "### Coverage of Modified Files:\n"
-      output << "File | Coverage\n"
-      output << ":-----|:-----:\n"
+      if touchedFilesHash.empty?
+        output << "The new and modified files are not part of the coverage report."
+      else
+        output << "### Coverage of Modified Files:\n"
+        output << "File | Coverage\n"
+        output << ":-----|:-----:\n"
+      end
 
       # go through each file:
       touchedFilesHash.sort.each do |fileName, coveragePercent|
@@ -185,17 +123,16 @@ module Danger
         end
       end
 
-      output << "### Modified Files Not Found In Coverage Report:\n"
-      fileNamesNotInReport.sort.each do |unreportedFileName| 
-        output << "#{unreportedFileName}\n"
-      end
+      output << "\n"
+      output << "Number of files not found in coverage report: #{fileNamesNotInReport.size}"
+      output << "\n"
 
-      output << '> Codebase cunningly covered by count [Shroud 🧛](https://github.com/livefront/danger-shroud)'
+      output << 'Code coverage generated by [danger-kover](https://github.com/JCarlosR/danger-kover), based on [Shroud](https://github.com/livefront/danger-shroud)'
       markdown output
 
       # warn or fail if total coverage is under specified threshold
       if (coveragePercent < totalProjectThreshold)
-        totalCoverageWarning = "Uh oh! Your project is under #{totalProjectThreshold}% coverage!"
+        totalCoverageWarning = "Oops! The project codebase is under #{totalProjectThreshold}% coverage."
         if (failIfUnderThreshold) 
           fail totalCoverageWarning
         else 
