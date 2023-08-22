@@ -1,4 +1,4 @@
-version: 2
+version: 1
 updates:
   - package-ecosystem: "bundler"
     directory: "/"
@@ -7,4 +7,4 @@ updates:
     open-pull-requests-limit: 0
     # Add/Remove reviewers here
     reviewers:
-      - "david-livefront"
+      - "JCarlosR"

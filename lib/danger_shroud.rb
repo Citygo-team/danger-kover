@@ -1,1 +1,1 @@
-require "shroud/gem_version"
+require "kover/gem_version"

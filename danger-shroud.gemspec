@@ -1,16 +1,16 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'shroud/gem_version.rb'
+require 'kover/gem_version.rb'
 
 Gem::Specification.new do |spec|
-  spec.name          = 'danger-shroud'
-  spec.version       = Shroud::VERSION
+  spec.name          = 'danger-kover'
+  spec.version       = Kover::VERSION
   spec.authors       = ['andrewhaisting']
   spec.email         = ['ahaisting@gmail.com']
-  spec.description   = %q{Enforce Jacoco code coverage on CI.}
-  spec.summary       = %q{A danger plugin for enforcing code coverage via a Jacoco coverage report.}
-  spec.homepage      = 'https://github.com/livefront/livefront-shroud-android'
+  spec.description   = %q{Enforce Kover code coverage on CI.}
+  spec.summary       = %q{A danger plugin for enforcing code coverage via a Kover coverage report.}
+  spec.homepage      = 'https://github.com/JCarlosR/danger-kover'
   spec.license       = 'MIT'
 
   spec.files         = `git ls-files`.split($/)

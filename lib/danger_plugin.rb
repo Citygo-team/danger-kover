@@ -1,1 +1,1 @@
-require "shroud/plugin"
+require "kover/plugin"

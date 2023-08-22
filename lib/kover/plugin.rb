@@ -12,23 +12,23 @@ module Danger
   #
   #          # Report coverage of modified files, fail if either total project coverage
   #          # or any modified file's coverage is under 90%
-  #          shroud.reportKover 'Project Name', 'path/to/kover/report.xml'
+  #          kover.report 'Project Name', 'path/to/kover/report.xml'
   #
   # @example Running with custom coverage thresholds for Kover
   #
   #          # Report coverage of modified files, fail if total project coverage is under 80%,
   #          # or if any modified file's coverage is under 95%
-  #          shroud.reportKover 'Project Name', 'path/to/kover/report.xml', 80, 95
+  #          kover.report 'Project Name', 'path/to/kover/report.xml', 80, 95
   #
   # @example Warn on builds instead of failing for Kover
   #
   #          # Report coverage of modified files the same as the above example, except the
   #          # builds will only warn instead of fail if below thresholds
-  #          shroud.reportKover 'Project Name', 'path/to/kover/report.xml', 80, 95, false
+  #          kover.report 'Project Name', 'path/to/kover/report.xml', 80, 95, false
   #    
-  # @tags android, kover, jacoco, coverage
+  # @tags android, kover, code coverage, coverage report
   #
-  class DangerShroud < Plugin
+  class DangerKover < Plugin
 
     # Report coverage on diffed files, as well as overall coverage.
     #
@@ -51,7 +51,7 @@ module Danger
     #          default true.
     #
     # @return  [void]
-    def reportKover(moduleName, file, totalProjectThreshold = 90, modifiedFileThreshold = 90, failIfUnderThreshold = true)
+    def report(moduleName, file, totalProjectThreshold = 90, modifiedFileThreshold = 90, failIfUnderThreshold = true)
       internalReport('Kover', moduleName, file, totalProjectThreshold, modifiedFileThreshold, failIfUnderThreshold)
     end
 
