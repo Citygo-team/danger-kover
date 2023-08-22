@@ -30,6 +30,24 @@ module Danger
   #
   class DangerKover < Plugin
 
+    # Total project code coverage % threshold [0-100].
+    # @return [Integer]
+    attr_accessor :total_threshold
+
+    # Modified file code coverage % threshold [0-100].
+    # @return [Integer]
+    attr_accessor :file_threshold
+
+    # Fail if under threshould, just warn otherwise.
+    # @return [Boolean]
+    attr_accessor :fail_if_under_threshold
+
+    # A getter for `fail_if_under_threshold`, returning `true` by default.
+    # @return [Boolean]
+    def fail_if_under_threshold
+      @fail_if_under_threshold ||= true
+    end
+
     # Report coverage on diffed files, as well as overall coverage.
     #
     # @param   [String] moduleName
@@ -38,26 +56,10 @@ module Danger
     # @param   [String] file
     #          file path to a Kover xml coverage report.
     #
-    # @param   [Integer] totalProjectThreshold
-    #          defines the required percentage of total project coverage for a passing build.
-    #          default 90.
-    #
-    # @param   [Integer] modifiedFileThreshold
-    #          defines the required percentage of files modified in a PR for a passing build.
-    #          default 90.
-    #
-    # @param   [Boolean] failIfUnderThreshold
-    #          if true, will fail builds that are under the provided thresholds. if false, will only warn.
-    #          default true.
-    #
     # @return  [void]
-    def report(moduleName, file, totalProjectThreshold = 90, modifiedFileThreshold = 90, failIfUnderThreshold = true)
-      internalReport('Kover', moduleName, file, totalProjectThreshold, modifiedFileThreshold, failIfUnderThreshold)
-    end
-
-    private def internalReport(reportType, moduleName, file, totalProjectThreshold, modifiedFileThreshold, failIfUnderThreshold)
+    def report(moduleName, file)
       raise "Please specify file name." if file.empty?
-      raise "No #{reportType} xml report found at #{file}" unless File.exist? file
+      raise "No Kover xml report found at #{file}" unless File.exist? file
       
       rawXml = File.read(file)
       parsedXml = Nokogiri::XML.parse(rawXml)
@@ -113,9 +115,9 @@ module Danger
         output << "`#{fileName}` | **`#{'%.2f' % coveragePercent}%`**\n"
 
         # warn or fail if under specified file threshold:
-        if (coveragePercent < modifiedFileThreshold)
-          warningMessage = "Uh oh! #{fileName} is under #{modifiedFileThreshold}% coverage!"
-          if (failIfUnderThreshold)
+        if (coveragePercent < file_threshold)
+          warningMessage = "Uh oh! #{fileName} is under #{file_threshold}% coverage!"
+          if (fail_if_under_threshold)
             fail warningMessage
           else 
             warn warningMessage
@@ -131,9 +133,10 @@ module Danger
       markdown output
 
       # warn or fail if total coverage is under specified threshold
-      if (coveragePercent < totalProjectThreshold)
-        totalCoverageWarning = "Oops! The project codebase is under #{totalProjectThreshold}% coverage."
-        if (failIfUnderThreshold) 
+      if (coveragePercent < total_threshold)
+        totalCoverageWarning = "Oops! The project codebase is under #{total_threshold}% coverage."
+        
+        if (fail_if_under_threshold) 
           fail totalCoverageWarning
         else 
           warn totalCoverageWarning

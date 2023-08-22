@@ -26,20 +26,21 @@ Running with default values:
 kover.report 'Module Name', 'path/to/kover/report.xml'
 ```
 
-Running with custom coverage thresholds:
+Running with custom attributes:
+
+- Fail if total project coverage is under 70%.
+- Or if any modified file's coverage is under 80%.
 
 ```ruby
-# Report coverage of modified files, fail if total project coverage is under 80%,
-# or if any modified file's coverage is under 95%
-kover.report 'Module Name', 'path/to/kover/report.xml', 80, 95
+kover.total_threshold = 70
+kover.file_threshold = 80
+kover.report 'Module Name', 'path/to/kover/report.xml'
 ```
 
-Warn on builds instead of fail:
+Optional attribute to only warn instead of failing if below thresholds:
 
 ```ruby
-# Report coverage of modified files the same as the above example, except the
-# builds will only warn instead of fail if below thresholds
-kover.report 'Module Name', 'path/to/kover/report.xml', 80, 95, false
+kover.fail_if_under_threshold false
 ```
 
 ## Development
