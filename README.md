@@ -43,6 +43,10 @@ Optional attribute to only warn instead of failing if below thresholds:
 kover.fail_if_under_threshold = false
 ```
 
+## Credits
+
+This is a fork, based on [Shroud](https://github.com/livefront/danger-shroud).
+
 ## Development
 
 1. Clone this repo
@@ -50,3 +54,17 @@ kover.fail_if_under_threshold = false
 3. Run `bundle exec rake spec` to run the tests.
 4. Use `bundle exec guard` to automatically have tests run as you make changes.
 5. Make your changes.
+
+## Publishing
+
+How to build a gem (make sure to update the version):
+
+```
+gem build danger-kover.gemspec
+```
+
+How to publish a gem:
+
+```
+gem push danger-kover-VERSION.gem
+```
