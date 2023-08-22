@@ -146,7 +146,7 @@ module Danger
 
       # warn or fail if total coverage is under specified threshold
       if (coveragePercent < total_threshold)
-        totalCoverageWarning = "Oops! The project codebase is under #{total_threshold}% coverage."
+        totalCoverageWarning = "Oops! The module #{moduleName} codebase is under #{total_threshold}% coverage."
         
         if (fail_if_under_threshold) 
           fail totalCoverageWarning
