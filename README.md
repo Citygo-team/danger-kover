@@ -40,7 +40,7 @@ kover.report 'Module Name', 'path/to/kover/report.xml'
 Optional attribute to only warn instead of failing if below thresholds:
 
 ```ruby
-kover.fail_if_under_threshold false
+kover.fail_if_under_threshold = false
 ```
 
 ## Development
