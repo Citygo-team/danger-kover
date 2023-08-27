@@ -1,6 +1,6 @@
 # danger-kover
 
-A danger plugin for enforcing code coverage coverage based on a Kover coverage report.
+A danger plugin for enforcing test code coverage % based on a Kover coverage report.
 
 ![Danger Kover Warning Messages](images/danger-kover-warning-messages.jpg)
 ![Multi Module Code Coverage Report](images/multi-module-code-coverage.jpg)
