@@ -54,10 +54,14 @@ module Danger
     # @return [Boolean]
     attr_accessor :fail_if_under_threshold
 
-    # A getter for `fail_if_under_threshold`, returning `true` by default.
+    # A getter for `fail_if_under_threshold`, returning `true` if not defined.
     # @return [Boolean]
     def fail_if_under_threshold
-      @fail_if_under_threshold ||= true
+      if defined?(@fail_if_under_threshold)
+        @fail_if_under_threshold
+      else
+        true
+      end
     end
 
     # Show plugin repository link.
@@ -67,7 +71,11 @@ module Danger
     # A getter for `link_repository`, returning `true` by default.
     # @return [Boolean]
     def link_repository
-      @link_repository ||= true
+      if defined?(@link_repository)
+        @link_repository
+      else
+        true
+      end
     end
 
     # Show not found files in report count.
@@ -77,7 +85,11 @@ module Danger
     # A getter for `count_not_found`, returning `true` by default.
     # @return [Boolean]
     def count_not_found
-      @count_not_found ||= true
+      if defined?(@count_not_found)
+        @count_not_found
+      else
+        true
+      end
     end
 
     # Report coverage on diffed files, as well as overall coverage.
@@ -129,15 +141,16 @@ module Danger
 
       puts "Here are unreported files"
       puts fileNamesNotInReport.to_s
+      
       puts "Here is the touched files coverage hash"
       puts touchedFilesHash
 
-      output = "### 🎯 #{moduleName} Code Coverage: **`#{'%.2f' % coveragePercent}%`**\n"
+      output = "### 🎯 #{moduleName} Code Coverage: **`#{'%.2f' % coveragePercent}%`**\n\n"
 
       if touchedFilesHash.empty?
         output << "The new and updated files are not part of this module coverage report 👀.\n"
       else
-        output << "**Modified files:**\n"
+        output << "**Modified files:**\n\n"
         output << "File | Coverage\n"
         output << ":-----|:-----:\n"
       end
@@ -153,6 +166,9 @@ module Danger
           advise("Oops! #{fileName} is under #{file_threshold}% coverage.")
         end
       end
+
+      puts "Value of count_not_found: #{count_not_found}"
+      puts "Value of link_repository: #{link_repository}"
 
       if (count_not_found)
         output << "\n\n"
