@@ -101,7 +101,7 @@ module Danger
     #          file path to a Kover xml coverage report.
     #
     # @return  [void]
-    def report(moduleName, file)
+    def report(moduleName, file, reportUrl=nil)
       raise "Please specify file name." if file.empty?
       raise "No Kover xml report found at #{file}" unless File.exist? file
       
@@ -165,6 +165,10 @@ module Danger
         elsif (coveragePercent < file_threshold)
           advise("Oops! #{fileName} is under #{file_threshold}% coverage.")
         end
+      end
+
+      if reportUrl
+        output << "\n\n Find coverage HTML report [here](#{reportUrl})"
       end
 
       puts "Value of count_not_found: #{count_not_found}"
